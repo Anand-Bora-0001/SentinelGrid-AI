@@ -1,0 +1,332 @@
+name: 🍯 HoneyCloud-X CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # ============================================================================
+  # TESTING & QUALITY ASSURANCE
+  # ============================================================================
+  
+  backend-tests:
+    name: 🧪 Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: honeycloud_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: 📦 Install Dependencies
+      run: |
+        cd backend
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov pytest-mock black flake8 mypy
+    
+    - name: 🔍 Code Quality Checks
+      run: |
+        cd backend
+        # Format check
+        black --check --diff .
+        # Linting
+        flake8 app/ --max-line-length=88 --extend-ignore=E203,W503
+        # Type checking
+        mypy app/ --ignore-missing-imports
+    
+    - name: 🧪 Run Backend Tests
+      env:
+        DATABASE_URL: postgresql://postgres:testpass@localhost:5432/honeycloud_test
+        REDIS_URL: redis://localhost:6379
+        TESTING: true
+      run: |
+        cd backend
+        pytest --cov=app --cov-report=xml --cov-report=html --cov-fail-under=80 -v
+    
+    - name: 📊 Upload Coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage.xml
+        flags: backend
+        name: backend-coverage
+
+  frontend-tests:
+    name: 🌐 Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🟢 Set up Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: 📦 Install Frontend Dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: 🔍 Frontend Linting
+      run: |
+        cd frontend
+        npm run lint
+    
+    - name: 🧪 Frontend Tests
+      run: |
+        cd frontend
+        npm run test:coverage
+    
+    - name: 📊 Upload Frontend Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: 🐳 Build Docker Images
+      run: |
+        docker-compose -f docker-compose.test.yml build
+    
+    - name: 🚀 Start Test Environment
+      run: |
+        docker-compose -f docker-compose.test.yml up -d
+        sleep 30
+    
+    - name: 🧪 Run Integration Tests
+      run: |
+        python tests/test_dashboard_comprehensive.py
+        python backend/scripts/attack_simulation_comprehensive.py --test-mode
+    
+    - name: 🛑 Cleanup Test Environment
+      run: |
+        docker-compose -f docker-compose.test.yml down -v
+
+  # ============================================================================
+  # SECURITY SCANNING
+  # ============================================================================
+  
+  security-scan:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔍 Run Bandit Security Scan
+      run: |
+        pip install bandit[toml]
+        bandit -r backend/app/ -f json -o bandit-report.json
+    
+    - name: 🔍 Run Safety Check
+      run: |
+        pip install safety
+        safety check --json --output safety-report.json
+    
+    - name: 🔍 Run Semgrep Security Scan
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/secrets
+          p/python
+    
+    - name: 📊 Upload Security Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  # ============================================================================
+  # DOCKER BUILD & PUSH
+  # ============================================================================
+  
+  docker-build:
+    name: 🐳 Docker Build & Push
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests, security-scan]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔧 Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: 🔐 Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: 📝 Extract Metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: honeycloud/honeycloud-x
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: 🏗️ Build and Push Backend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: 🏗️ Build and Push Frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        push: true
+        tags: honeycloud/honeycloud-x-frontend:${{ github.ref_name }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # ============================================================================
+  # DEPLOYMENT
+  # ============================================================================
+  
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [integration-tests, docker-build]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🚀 Deploy to Staging
+      run: |
+        echo "🚀 Deploying to staging environment..."
+        # Add staging deployment commands here
+        # kubectl apply -f k8s/staging/
+    
+    - name: 🧪 Run Smoke Tests
+      run: |
+        echo "🧪 Running smoke tests on staging..."
+        # Add smoke test commands here
+
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [integration-tests, docker-build]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🚀 Deploy to Production
+      run: |
+        echo "🚀 Deploying to production environment..."
+        # Add production deployment commands here
+        # kubectl apply -f k8s/production/
+    
+    - name: 🧪 Run Health Checks
+      run: |
+        echo "🧪 Running production health checks..."
+        # Add health check commands here
+
+  # ============================================================================
+  # RELEASE MANAGEMENT
+  # ============================================================================
+  
+  create-release:
+    name: 📦 Create Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 📦 Generate Release Notes
+      run: |
+        echo "📦 Generating release notes for ${{ github.event.release.tag_name }}"
+        # Add release notes generation
+    
+    - name: 📊 Generate Release Artifacts
+      run: |
+        echo "📊 Generating release artifacts..."
+        # Add artifact generation commands
+    
+    - name: 📤 Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./release-artifacts.zip
+        asset_name: honeycloud-x-${{ github.event.release.tag_name }}.zip
+        asset_content_type: application/zip

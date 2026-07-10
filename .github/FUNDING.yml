@@ -1,0 +1,28 @@
+# 💰 Funding Configuration for HoneyCloud-X
+
+# GitHub Sponsors
+github: [honeycloud-x]
+
+# Open Collective
+open_collective: honeycloud-x
+
+# Ko-fi
+ko_fi: honeycloud
+
+# Tidelift
+tidelift: "pypi/honeycloud-x"
+
+# Community Bridge
+community_bridge: honeycloud-x
+
+# Liberapay
+liberapay: honeycloud
+
+# IssueHunt
+issuehunt: honeycloud-x
+
+# Other funding sources
+custom: [
+  "https://www.paypal.com/donate?hosted_button_id=HONEYCLOUD",
+  "https://buy.stripe.com/honeycloud-donation"
+]

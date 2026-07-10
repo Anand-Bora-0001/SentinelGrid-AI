@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  # ========================
+  # Backend API Service
+  # ========================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sentinelgrid-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://sentinelgrid:sentinelgrid_secret@db:5432/sentinelgrid
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-change-this-to-a-strong-random-string-at-least-32-chars}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    volumes:
+      - backend-reports:/app/reports
+      - backend-logs:/app/logs
+      - ./data/mitre_attack_enterprise.json:/app/app/data/mitre_attack_enterprise.json:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # ========================
+  # Frontend (Nginx)
+  # ========================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sentinelgrid-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  # ========================
+  # PostgreSQL Database
+  # ========================
+  db:
+    image: postgres:15-alpine
+    container_name: sentinelgrid-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=sentinelgrid
+      - POSTGRES_USER=sentinelgrid
+      - POSTGRES_PASSWORD=sentinelgrid_secret
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinelgrid -d sentinelgrid"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========================
+  # Redis Cache
+  # ========================
+  redis:
+    image: redis:7-alpine
+    container_name: sentinelgrid-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 128mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========================
+  # ChromaDB (Vector Store)
+  # ========================
+  chromadb:
+    image: chromadb/chroma:0.4.24
+    container_name: sentinelgrid-chromadb
+    restart: unless-stopped
+    ports:
+      - "8002:8000"
+    volumes:
+      - chromadb-data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ALLOW_RESET=TRUE
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres-data:
+  redis-data:
+  backend-reports:
+  backend-logs:
+  chromadb-data:

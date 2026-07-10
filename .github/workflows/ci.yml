@@ -1,0 +1,87 @@
+name: HoneyCloud CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov
+    
+    - name: Run tests
+      run: |
+        cd backend
+        pytest --cov=app --cov-report=xml
+    
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./backend/coverage.xml
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run security scan
+      uses: securecodewarrior/github-action-add-sarif@v1
+      with:
+        sarif-file: 'security-scan.sarif'
+
+  build:
+    needs: [test]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker images
+      run: |
+        docker-compose build
+    
+    - name: Test Docker deployment
+      run: |
+        docker-compose up -d
+        sleep 30
+        curl -f http://localhost:8000/health || exit 1
+        docker-compose down
+
+  deploy:
+    needs: [test, build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deploy to production server"
+        # Add your deployment commands here

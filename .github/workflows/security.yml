@@ -1,0 +1,129 @@
+name: 🔒 Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  dependency-scan:
+    name: 📦 Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 🔍 Python Security Scan
+      run: |
+        pip install safety bandit
+        # Check for known vulnerabilities in dependencies
+        safety check --json --output safety-report.json || true
+        # Static security analysis
+        bandit -r backend/app/ -f json -o bandit-report.json || true
+    
+    - name: 🟢 Node.js Security Scan
+      run: |
+        cd frontend
+        npm audit --audit-level=moderate --json > npm-audit.json || true
+    
+    - name: 📊 Upload Security Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+          frontend/npm-audit.json
+
+  code-scanning:
+    name: 🔍 CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python', 'javascript' ]
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔍 Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+    
+    - name: 🏗️ Autobuild
+      uses: github/codeql-action/autobuild@v2
+    
+    - name: 🔍 Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+
+  container-scan:
+    name: 🐳 Container Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🏗️ Build Docker Images
+      run: |
+        docker build -t honeycloud-backend ./backend
+        docker build -t honeycloud-frontend ./frontend
+    
+    - name: 🔍 Scan Backend Container
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'honeycloud-backend'
+        format: 'sarif'
+        output: 'backend-trivy-results.sarif'
+    
+    - name: 🔍 Scan Frontend Container
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'honeycloud-frontend'
+        format: 'sarif'
+        output: 'frontend-trivy-results.sarif'
+    
+    - name: 📊 Upload Trivy Scan Results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'backend-trivy-results.sarif'
+    
+    - name: 📊 Upload Frontend Scan Results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'frontend-trivy-results.sarif'
+
+  secrets-scan:
+    name: 🔐 Secrets Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: 🔍 TruffleHog OSS
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified

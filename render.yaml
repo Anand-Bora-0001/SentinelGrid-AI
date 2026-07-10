@@ -1,0 +1,51 @@
+services:
+  # Backend API Service
+  - type: web
+    name: sentinelgrid-backend
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: "pip install --upgrade pip && pip install -r backend/requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sentinelgrid-db 
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: sentinelgrid-redis
+          property: connectionString
+      - key: FRONTEND_URL
+        value: https://sentinelgrid-frontend.vercel.app # Changed to vercel app
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: DEBUG
+        value: false
+      - key: LOG_LEVEL
+        value: INFO
+      - key: PYTHONUNBUFFERED
+        value: 1
+
+  # Redis Cache
+  - type: redis
+    name: sentinelgrid-redis
+    region: oregon
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  - name: sentinelgrid-db
+    databaseName: sentinelgrid
+    user: sentinelgrid
+    region: oregon
+    plan: starter

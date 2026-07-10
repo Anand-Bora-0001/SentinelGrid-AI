@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelgrid-backend
+  namespace: sentinelgrid
+  labels:
+    app: sentinelgrid
+    component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sentinelgrid
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: sentinelgrid
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: sentinelgrid-backend:latest
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sentinelgrid-secrets
+                  key: database-url
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: sentinelgrid-secrets
+                  key: jwt-secret-key
+            - name: REDIS_URL
+              value: "redis://sentinelgrid-redis:6379/0"
+            - name: DEBUG
+              value: "false"
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: PORT
+              value: "8000"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinelgrid-redis
+  namespace: sentinelgrid
+  labels:
+    app: sentinelgrid
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentinelgrid
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: sentinelgrid
+        component: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+      restartPolicy: Always

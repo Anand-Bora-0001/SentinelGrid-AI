@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinelgrid-backend
+  namespace: sentinelgrid
+  labels:
+    app: sentinelgrid
+    component: backend
+spec:
+  type: ClusterIP
+  selector:
+    app: sentinelgrid
+    component: backend
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinelgrid-redis
+  namespace: sentinelgrid
+  labels:
+    app: sentinelgrid
+    component: redis
+spec:
+  type: ClusterIP
+  selector:
+    app: sentinelgrid
+    component: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
