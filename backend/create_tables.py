@@ -15,24 +15,24 @@ from app.models import *  # Import all models
 
 def create_tables():
     """Create all database tables"""
-    print("🗄️ Creating database tables...")
+    print("️ Creating database tables...")
     
     try:
         # Create all tables
         Base.metadata.create_all(bind=engine)
-        print("✅ Database tables created successfully!")
+        print(" Database tables created successfully!")
         
         # List created tables
         from sqlalchemy import inspect
         inspector = inspect(engine)
         tables = inspector.get_table_names()
         
-        print(f"\n📋 Created tables ({len(tables)}):")
+        print(f"\n Created tables ({len(tables)}):")
         for table in sorted(tables):
             print(f"   - {table}")
             
     except Exception as e:
-        print(f"❌ Failed to create tables: {e}")
+        print(f" Failed to create tables: {e}")
         return False
     
     return True
@@ -40,8 +40,8 @@ def create_tables():
 if __name__ == "__main__":
     success = create_tables()
     if success:
-        print("\n🎉 Database initialization complete!")
+        print("\n Database initialization complete!")
         print("You can now start the SentinelGrid backend server.")
     else:
-        print("\n💥 Database initialization failed!")
+        print("\n Database initialization failed!")
         sys.exit(1)

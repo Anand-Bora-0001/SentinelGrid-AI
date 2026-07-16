@@ -97,9 +97,9 @@ def generate_excel_report(events: list, stats: dict, filename: str = None) -> st
 
         # Save file
         wb.save(filename)
-        logger.info(f"✅ Excel report generated: {filename}")
+        logger.info(f" Excel report generated: {filename}")
         return filename
 
     except Exception as e:
-        logger.error(f"❌ Error generating Excel: {e}")
+        logger.error(f" Error generating Excel: {e}")
         raise

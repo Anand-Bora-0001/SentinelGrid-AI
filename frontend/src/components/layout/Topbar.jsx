@@ -5,7 +5,8 @@ import {
   Cpu, 
   CheckCircle, 
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from "lucide-react";
 import { api } from "../../api/client";
 
@@ -36,6 +37,20 @@ export default function Topbar({ title }) {
       window.location.reload(); // Refresh the page to reload state
     } catch (err) {
       alert(`Simulation injection failed: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearLogs = async () => {
+    setLoading(true);
+    try {
+      await api.delete("/api/telemetry/clear");
+      await api.delete("/api/incidents/clear");
+      alert("All logs and incidents have been cleared and moved to the Recycle Bin.");
+      window.location.reload();
+    } catch (err) {
+      alert(`Clear failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -88,17 +103,31 @@ export default function Topbar({ title }) {
 
         {/* AI Engine Status */}
         <div className="flex items-center gap-2 border border-slate-800 bg-slate-950/60 rounded-full px-3 py-1.5 text-xs text-slate-400">
-          <Cpu className="h-3.5 w-3.5 text-cyber-purple animate-cyber-pulse" />
+          <Cpu className="h-3.5 w-3.5 text-cyber-purple animate-pulse" />
           <span className="font-mono text-[10px] text-cyber-purple uppercase tracking-wider">
             AI Resilience Core Active
           </span>
         </div>
 
+        {/* Clear Logs trigger */}
+        <button
+          onClick={handleClearLogs}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-all font-mono disabled:opacity-50"
+        >
+          {loading ? (
+            <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Trash2 className="h-3.5 w-3.5" />
+          )}
+          <span>Clear Logs</span>
+        </button>
+
         {/* Simulation trigger */}
         <button
           onClick={handleSimulate}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold bg-cyber-cyan text-cyber-bg hover:bg-cyber-cyan/90 transition-all font-mono shadow-cyber-neon disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold bg-cyber-cyan text-cyber-bg hover:bg-cyber-cyan/90 transition-all font-mono shadow-md disabled:opacity-50"
         >
           {loading ? (
             <RefreshCw className="h-3.5 w-3.5 animate-spin" />

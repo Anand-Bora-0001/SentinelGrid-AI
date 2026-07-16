@@ -33,9 +33,9 @@ async def test_telegram_alert(
         pdf_path = generate_pdf_report(events_response, stats_response)
 
         alert_message = f"""
-🚨 *SentinelGrid Test Alert*
+ *SentinelGrid Test Alert*
 
-📊 *System Status:*
+ *System Status:*
 • Total Events: {stats_response.get('total_events', 0)}
 • Critical Alerts: {stats_response.get('events_by_severity', {}).get('CRITICAL', 0)}
 
@@ -46,7 +46,7 @@ async def test_telegram_alert(
         message_sent = send_telegram_alert(alert_message, db=db, organization_id=org_id)
         pdf_sent = False
         if message_sent and pdf_path:
-            pdf_sent = send_telegram_document(pdf_path, "🍯 SentinelGrid Security Report", db=db, organization_id=org_id)
+            pdf_sent = send_telegram_document(pdf_path, " SentinelGrid Security Report", db=db, organization_id=org_id)
 
         if message_sent:
             return {"status": "success", "message": "Test alert sent!", "pdf_sent": pdf_sent}
@@ -93,7 +93,7 @@ async def test_email_alert(
                     'severity': 'HIGH', 'source_ip': '192.168.1.100',
                     'service': 'TEST', 'endpoint': '/test-alert',
                     'method': 'GET', 'timestamp': datetime.now().isoformat(),
-                    'location': {'country': 'Test Country', 'city': 'Test City', 'flag': '🧪', 'isp': 'Test ISP'}
+                    'location': {'country': 'Test Country', 'city': 'Test City', 'flag': '', 'isp': 'Test ISP'}
                 }
                 email_sent = email_service.send_alert_email(
                     to_emails=[email_address], alert_type="Test Security Alert",

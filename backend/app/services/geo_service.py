@@ -16,12 +16,12 @@ _geo_cache: Dict[str, dict] = {}
 def get_country_flag(country_code: str) -> str:
     """Convert country code to flag emoji"""
     if not country_code or country_code == 'XX':
-        return '🌍'
+        return ''
     try:
         codepoints = [127397 + ord(char) for char in country_code.upper()]
         return ''.join(chr(cp) for cp in codepoints)
     except Exception:
-        return '🌍'
+        return ''
 
 def get_location_from_ip(ip: str) -> dict:
     """Get location from IP using ip-api.com (free, includes lat/lng)"""

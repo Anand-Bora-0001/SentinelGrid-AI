@@ -81,16 +81,16 @@ app.include_router(threat_intel_router)
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info(f"🚀 Starting {settings.app_name} v{settings.app_version}")
-    logger.info(f"🔧 Environment: {'Development' if settings.debug else 'Production'}")
+    logger.info(f" Starting {settings.app_name} v{settings.app_version}")
+    logger.info(f" Environment: {'Development' if settings.debug else 'Production'}")
 
     # Initialize database
     try:
         from .database import init_db
         init_db()
-        logger.info("✅ Database initialized")
+        logger.info(" Database initialized")
     except Exception as e:
-        logger.error(f"❌ Database init failed: {e}")
+        logger.error(f" Database init failed: {e}")
 
     # Seed initial assets and vulnerabilities if db is empty
     try:
@@ -104,7 +104,7 @@ async def startup_event():
         # Check if assets exist
         asset_count = db.query(Asset).count()
         if asset_count == 0:
-            logger.info("🌱 Seeding initial CNI asset topology...")
+            logger.info(" Seeding initial CNI asset topology...")
             from .services.simulation_engine import simulation_engine
             from .models import Organization
             org = db.query(Organization).first()
@@ -114,7 +114,7 @@ async def startup_event():
                     asset = Asset(organization_id=org.id, **asset_data)
                     db.add(asset)
                 db.commit()
-                logger.info("✅ Assets seeded successfully")
+                logger.info(" Assets seeded successfully")
                 
                 # Seed vulnerabilities
                 from .models import Vulnerability
@@ -134,11 +134,11 @@ async def startup_event():
                     )
                     db.add(v)
                 db.commit()
-                logger.info("✅ Vulnerabilities seeded successfully")
+                logger.info(" Vulnerabilities seeded successfully")
     except Exception as e:
-        logger.error(f"❌ Startup seeding failed: {e}")
+        logger.error(f" Startup seeding failed: {e}")
 
-    logger.info(f"📚 API Docs: http://{settings.host}:{settings.port}/docs")
+    logger.info(f" API Docs: http://{settings.host}:{settings.port}/docs")
 
 
 # ========================

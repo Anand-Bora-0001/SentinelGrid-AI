@@ -59,7 +59,7 @@ else:
             "options": "-c statement_timeout=30000"  # 30s query timeout
         } if "neon" in DATABASE_URL else {},
     )
-    logger.info(f"🐘 PostgreSQL engine configured (pool_size=5, max_overflow=10)")
+    logger.info(f" PostgreSQL engine configured (pool_size=5, max_overflow=10)")
 
 # ========================
 # SESSION & BASE
@@ -84,9 +84,9 @@ def init_db():
     try:
         from . import models  # noqa: F401 — registers all models with Base
         Base.metadata.create_all(bind=engine)
-        logger.info("✅ Database tables created successfully")
+        logger.info(" Database tables created successfully")
     except Exception as e:
-        logger.error(f"❌ Failed to create database tables: {e}")
+        logger.error(f" Failed to create database tables: {e}")
         raise
 
 

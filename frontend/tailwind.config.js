@@ -8,27 +8,27 @@ export default {
     extend: {
       colors: {
         cyber: {
-          bg: "#0a0e17",       // Deep navy-black base
-          card: "#111827",     // Dark card surface
-          elevated: "#1a2235", // Elevated panels/modals
-          border: "#1e293b",   // Subtle borders
-          cyan: "#06b6d4",     // Primary action/interactive
-          blue: "#3b82f6",     // Secondary accent
-          purple: "#8b5cf6",   // AI/ML engine color
-          success: "#22c55e",  // Low risk
-          warning: "#eab308",  // Medium risk
-          orange: "#f97316",   // High risk
-          danger: "#ef4444",   // Critical risk
+          bg: "#0f172a",       // slate-900
+          card: "#1e293b",     // slate-800
+          elevated: "#334155", // slate-700
+          border: "#475569",   // slate-600
+          cyan: "#0284c7",     // sky-600 (more muted blue)
+          blue: "#2563eb",     // blue-600
+          purple: "#7c3aed",   // violet-600
+          success: "#16a34a",  // green-600
+          warning: "#ca8a04",  // yellow-600
+          orange: "#ea580c",   // orange-600
+          danger: "#dc2626",   // red-600
         }
       },
       fontFamily: {
-        sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
-        mono: ['Fira Code', 'JetBrains Mono', 'monospace'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
-        'cyber-neon': '0 0 15px rgba(6, 182, 212, 0.15)',
-        'cyber-neon-purple': '0 0 15px rgba(139, 92, 246, 0.15)',
-        'cyber-neon-danger': '0 0 15px rgba(239, 68, 68, 0.2)',
+        'cyber-neon': 'none',
+        'cyber-neon-purple': 'none',
+        'cyber-neon-danger': 'none',
       }
     },
   },

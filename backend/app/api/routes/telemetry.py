@@ -305,6 +305,51 @@ async def simulate_telemetry(
         minute_offset = random.randint(0, 59)
         event_time = now - timedelta(days=day_offset, hours=hour_offset, minutes=minute_offset)
         event_data["timestamp"] = event_time.isoformat()
+        
+    # If attack campaign is included, create a simulated incident and audit log
+    if include_attack:
+        from ...models import Incident, AuditLog
+        sim_incident = Incident(
+            organization_id=org.id,
+            title="Operation ShadowGrid (Simulated APT Campaign)",
+            description="Multi-stage attack campaign targeting power grid SCADA systems. Detected via anomalous network flows and unauthorized access attempts.",
+            severity="CRITICAL",
+            status="new",
+            created_by="ai_correlator",
+            mitre_techniques=["T1190", "T1059", "T1082", "T1003", "T1021", "T1005", "T0855"],
+            attack_stage="Impact",
+            affected_assets=[{"id": 1, "name": "Web Application Server"}, {"id": 10, "name": "SCADA HMI Server"}],
+            blast_radius=85.0,
+            business_impact="critical",
+            timeline=[
+                {"timestamp": now.isoformat(), "event": "Simulated Incident Created", "actor": "system"}
+            ]
+        )
+        db.add(sim_incident)
+        
+        sim_audit = AuditLog(
+            timestamp=now,
+            actor=current_user["username"],
+            actor_user_id=user.id if 'user' in locals() else None,
+            action="simulate",
+            resource_type="telemetry",
+            details={"message": "Injected 50 simulated telemetry events and multi-stage CNI campaign"},
+            organization_id=org.id
+        )
+        db.add(sim_audit)
+        
+        # We need to commit so the incident gets an ID if we want to link telemetry
+        try:
+            db.commit()
+            db.refresh(sim_incident)
+            
+            # Link the generated campaign events to this incident
+            if 'campaign_events' in locals():
+                for ce in campaign_events:
+                    ce['incident_id'] = sim_incident.id
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to create simulated incident: {e}")
 
     saved_count = 0
     severity_breakdown = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "INFO": 0}
@@ -397,21 +442,37 @@ def clear_telemetry(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Clear all telemetry data"""
-    from ...models import SecurityTelemetry, User
-
+    """Clear all telemetry data and related alerts/incidents (Demo Reset)"""
+    from ...models import SecurityTelemetry, User, Incident, AnomalyEvent, RiskAssessment
+    
     user = db.query(User).filter(User.username == current_user["username"]).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+        
+    org_id = user.organization_id
 
-    updated = db.query(SecurityTelemetry).filter(
-        SecurityTelemetry.organization_id == user.organization_id,
+    updated_tel = db.query(SecurityTelemetry).filter(
+        SecurityTelemetry.organization_id == org_id,
         SecurityTelemetry.is_deleted == False
     ).update({"is_deleted": True})
+    
+    updated_inc = db.query(Incident).filter(
+        Incident.organization_id == org_id,
+        Incident.is_deleted == False
+    ).update({"is_deleted": True})
+    
+    # Hard delete UEBA data (no soft-delete column)
+    db.query(AnomalyEvent).filter(AnomalyEvent.organization_id == org_id).delete()
+    db.query(RiskAssessment).filter(RiskAssessment.organization_id == org_id).delete()
+    
+    # Delete vulnerabilities to clear the patch prioritization dashboard
+    from ...models import Vulnerability
+    db.query(Vulnerability).filter(Vulnerability.organization_id == org_id).delete()
+    
     db.commit()
     _event_buffer.clear()
 
-    return {"status": "success", "deleted": updated}
+    return {"status": "success", "deleted": updated_tel, "incidents_deleted": updated_inc}
 
 
 @router.get("/deleted/all")

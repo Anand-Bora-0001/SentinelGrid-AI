@@ -35,10 +35,10 @@ def send_telegram_alert(message: str, db: Session = None, organization_id: int =
                 response = requests.post(url, json=payload, timeout=10)
                 
                 if response.ok:
-                    logger.info("✅ Telegram alert sent successfully (database config)")
+                    logger.info(" Telegram alert sent successfully (database config)")
                     return True
                 else:
-                    logger.error(f"❌ Telegram alert failed: {response.status_code} - {response.text}")
+                    logger.error(f" Telegram alert failed: {response.status_code} - {response.text}")
                     return False
     except Exception as e:
         logger.warning(f"Database Telegram config failed: {e}")
@@ -59,14 +59,14 @@ def send_telegram_alert(message: str, db: Session = None, organization_id: int =
         response = requests.post(url, json=payload, timeout=10)
         
         if response.ok:
-            logger.info("✅ Telegram alert sent successfully (global config)")
+            logger.info(" Telegram alert sent successfully (global config)")
             return True
         else:
-            logger.error(f"❌ Telegram alert failed: {response.status_code} - {response.text}")
+            logger.error(f" Telegram alert failed: {response.status_code} - {response.text}")
             return False
             
     except Exception as e:
-        logger.error(f"❌ Telegram alert error: {e}")
+        logger.error(f" Telegram alert error: {e}")
         return False
 
 def send_telegram_document(file_path: str, caption: str = "", db: Session = None, organization_id: int = None) -> bool:
@@ -82,7 +82,7 @@ def send_telegram_document(file_path: str, caption: str = "", db: Session = None
             
             if config and config.telegram_bot_token and config.telegram_chat_id:
                 if not os.path.exists(file_path):
-                    logger.error(f"❌ File not found: {file_path}")
+                    logger.error(f" File not found: {file_path}")
                     return False
                 
                 url = f"https://api.telegram.org/bot{config.telegram_bot_token}/sendDocument"
@@ -97,10 +97,10 @@ def send_telegram_document(file_path: str, caption: str = "", db: Session = None
                     response = requests.post(url, files=files, data=data, timeout=30)
                 
                 if response.ok:
-                    logger.info(f"✅ Telegram document sent: {os.path.basename(file_path)} (database config)")
+                    logger.info(f" Telegram document sent: {os.path.basename(file_path)} (database config)")
                     return True
                 else:
-                    logger.error(f"❌ Telegram document failed: {response.status_code} - {response.text}")
+                    logger.error(f" Telegram document failed: {response.status_code} - {response.text}")
                     return False
     except Exception as e:
         logger.warning(f"Database Telegram document failed: {e}")
@@ -111,7 +111,7 @@ def send_telegram_document(file_path: str, caption: str = "", db: Session = None
         return False
     
     if not os.path.exists(file_path):
-        logger.error(f"❌ File not found: {file_path}")
+        logger.error(f" File not found: {file_path}")
         return False
     
     try:
@@ -127,14 +127,14 @@ def send_telegram_document(file_path: str, caption: str = "", db: Session = None
             response = requests.post(url, files=files, data=data, timeout=30)
         
         if response.ok:
-            logger.info(f"✅ Telegram document sent: {os.path.basename(file_path)} (global config)")
+            logger.info(f" Telegram document sent: {os.path.basename(file_path)} (global config)")
             return True
         else:
-            logger.error(f"❌ Telegram document failed: {response.status_code} - {response.text}")
+            logger.error(f" Telegram document failed: {response.status_code} - {response.text}")
             return False
             
     except Exception as e:
-        logger.error(f"❌ Telegram document error: {e}")
+        logger.error(f" Telegram document error: {e}")
         return False
 
 def send_email_alert(
@@ -168,14 +168,14 @@ def send_email_alert(
         )
         
         if success:
-            logger.info(f"✅ Email alert sent to {', '.join(to_emails)}")
+            logger.info(f" Email alert sent to {', '.join(to_emails)}")
         else:
-            logger.error("❌ Failed to send email alert")
+            logger.error(" Failed to send email alert")
         
         return success
         
     except Exception as e:
-        logger.error(f"❌ Email alert error: {e}")
+        logger.error(f" Email alert error: {e}")
         return False
 
 def handle_security_event(event: dict, db: Session = None) -> None:
@@ -191,7 +191,7 @@ def handle_security_event(event: dict, db: Session = None) -> None:
         source_ip = event.get('source_ip', 'Unknown')
         service = event.get('service', 'Unknown')
         
-        logger.info(f"🚨 Processing {severity} alert from {source_ip} on {service}")
+        logger.info(f" Processing {severity} alert from {source_ip} on {service}")
         
         # Only alert on MEDIUM, HIGH and CRITICAL events
         if severity not in ['MEDIUM', 'HIGH', 'CRITICAL']:
@@ -258,10 +258,10 @@ def handle_security_event(event: dict, db: Session = None) -> None:
             else:
                 logger.info("Email service configured but no recipients specified for automatic alerts")
         
-        logger.info(f"✅ Alert processing delegated (Async: {CELERY_AVAILABLE})")
+        logger.info(f" Alert processing delegated (Async: {CELERY_AVAILABLE})")
         
     except Exception as e:
-        logger.error(f"❌ Error handling attack event: {e}")
+        logger.error(f" Error handling attack event: {e}")
 
 def generate_alert_message(event: dict) -> str:
     """Generate formatted alert message for Telegram"""
@@ -274,29 +274,29 @@ def generate_alert_message(event: dict) -> str:
     
     # Severity emoji mapping
     severity_emojis = {
-        'CRITICAL': '🔴',
-        'HIGH': '🟠',
-        'MEDIUM': '🟡',
-        'LOW': '🟢'
+        'CRITICAL': '',
+        'HIGH': '',
+        'MEDIUM': '',
+        'LOW': ''
     }
     
-    emoji = severity_emojis.get(severity, '⚪')
-    flag = location.get('flag', '🌍')
+    emoji = severity_emojis.get(severity, '')
+    flag = location.get('flag', '')
     country = location.get('country', 'Unknown')
     city = location.get('city', 'Unknown')
     
     message = f"""
-🚨 <b>SentinelGrid Security Alert</b>
+ <b>SentinelGrid Security Alert</b>
 
 {emoji} <b>Severity:</b> {severity}
-🎯 <b>Service:</b> {service}
-🌐 <b>Source IP:</b> <code>{source_ip}</code>
-📍 <b>Location:</b> {flag} {city}, {country}
-🔗 <b>Endpoint:</b> {endpoint}
+ <b>Service:</b> {service}
+ <b>Source IP:</b> <code>{source_ip}</code>
+ <b>Location:</b> {flag} {city}, {country}
+ <b>Endpoint:</b> {endpoint}
 ⏰ <b>Time:</b> {timestamp}
 
-🛡️ <b>Threat detected and logged</b>
-📊 Check dashboard for details
+️ <b>Threat detected and logged</b>
+ Check dashboard for details
     """
     
     return message.strip()
@@ -330,19 +330,19 @@ def send_comprehensive_alert(event: dict, alert_type: str = "telegram"):
             # Send email alert (would need recipient list)
             logger.info("Email alert requested but no recipients specified")
         
-        logger.info(f"📄 Comprehensive {alert_type} alert sent with PDF report")
+        logger.info(f" Comprehensive {alert_type} alert sent with PDF report")
         
     except Exception as e:
-        logger.error(f"❌ Failed to send comprehensive alert: {e}")
+        logger.error(f" Failed to send comprehensive alert: {e}")
 
 def send_test_telegram_alert() -> bool:
     """Send test Telegram alert"""
     test_message = f"""
-🧪 <b>SentinelGrid Test Alert</b>
+ <b>SentinelGrid Test Alert</b>
 
-✅ <b>System Status:</b> All systems operational
-📊 <b>Monitoring:</b> Active
-🔔 <b>Alerts:</b> Configured and working
+ <b>System Status:</b> All systems operational
+ <b>Monitoring:</b> Active
+ <b>Alerts:</b> Configured and working
 ⏰ <b>Test Time:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 This is a test message from SentinelGrid Security Monitoring.
@@ -362,7 +362,7 @@ def send_test_email_alert(to_emails: List[str]) -> bool:
         'location': {
             'country': 'Test Country',
             'city': 'Test City',
-            'flag': '🧪',
+            'flag': '',
             'isp': 'Test ISP'
         }
     }

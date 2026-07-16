@@ -69,7 +69,13 @@ export default function ActiveIncidents() {
       setLoading(false);
     };
     init();
-  }, []);
+
+    const intervalId = setInterval(() => {
+      fetchIncidents();
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [selectedIncident]);
 
   const handleGenerateResponse = async () => {
     if (!selectedIncident) return;
@@ -216,7 +222,7 @@ export default function ActiveIncidents() {
                   onClick={() => selectIncident(inc)}
                   className={`p-4 rounded-xl border text-left cursor-pointer transition-all duration-200 ${
                     selectedIncident?.id === inc.id
-                      ? "bg-slate-800/50 border-cyber-cyan shadow-cyber-neon"
+                      ? "bg-slate-800/50 border-cyber-cyan shadow-md"
                       : "bg-slate-900/60 border-slate-850 hover:border-slate-800"
                   }`}
                 >
@@ -391,7 +397,7 @@ export default function ActiveIncidents() {
                         <button
                           onClick={handleGenerateResponse}
                           disabled={generatingActions}
-                          className="px-4 py-2 bg-cyber-purple text-white text-xs font-semibold rounded hover:bg-cyber-purple/90 transition-all font-mono shadow-cyber-neon-purple flex items-center gap-2 mx-auto disabled:opacity-50"
+                          className="px-4 py-2 bg-cyber-purple text-white text-xs font-semibold rounded hover:bg-cyber-purple/90 transition-all font-mono shadow-md-purple flex items-center gap-2 mx-auto disabled:opacity-50"
                         >
                           <Sparkles className="h-3.5 w-3.5" />
                           <span>{generatingActions ? "GENERATING PLAYBOOKS..." : "GENERATE AI ACTIONS"}</span>
@@ -441,7 +447,7 @@ export default function ActiveIncidents() {
                                 <p className="text-cyber-cyan font-bold mb-1">SIMULATION LOGS:</p>
                                 <div><span className="text-slate-500">Affected Node:</span> {act.simulation_result.systems_affected?.join(", ")}</div>
                                 <div><span className="text-slate-500">Rollback:</span> {act.simulation_result.rollback_procedure}</div>
-                                <div className="text-amber-500 mt-1">⚠️ {act.simulation_result.note}</div>
+                                <div className="text-amber-500 mt-1">️ {act.simulation_result.note}</div>
                               </div>
                             ) : null}
                           </div>

@@ -107,7 +107,7 @@ def create_demo_scenarios(db: Session):
     db.add(inc2)
     db.add(inc3)
     db.commit()
-    print("✅ Successfully seeded 3 perfect demo scenarios!")
+    print(" Successfully seeded 3 perfect demo scenarios!")
 
 if __name__ == "__main__":
     db = SessionLocal()

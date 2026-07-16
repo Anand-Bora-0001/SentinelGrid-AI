@@ -145,7 +145,7 @@ async def ingest_event(event: Dict, request: Request):
         return {"status": "received", "id": enriched_event["id"]}
 
     except Exception as e:
-        logger.error(f"❌ Ingest failed: {e}")
+        logger.error(f" Ingest failed: {e}")
         raise HTTPException(status_code=500, detail=f"Ingest failed: {str(e)}")
 
 
@@ -236,13 +236,13 @@ def clear_events(
         except Exception:
             pass
 
-        logger.info(f"✅ User {current_user['username']} cleared {deleted_count} events")
+        logger.info(f" User {current_user['username']} cleared {deleted_count} events")
         return {"status": "success", "message": f"Successfully purged {deleted_count} intelligence records"}
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        logger.error(f"❌ Failed to clear events: {e}")
+        logger.error(f" Failed to clear events: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -404,18 +404,18 @@ async def simulate_attacks(
 ):
     """Manually trigger attack simulation with randomized global origins and coordinates"""
     global_origins = [
-        {"ip": "198.51.100.42", "lat": 37.0902, "lng": -95.7129, "country": "United States", "country_code": "US", "city": "Coffeyville", "region": "Kansas", "isp": "Google LLC", "flag": "🇺🇸"},
-        {"ip": "95.163.220.12", "lat": 55.7558, "lng": 37.6173, "country": "Russia", "country_code": "RU", "city": "Moscow", "region": "Moscow", "isp": "Digital Ocean", "flag": "🇷🇺"},
-        {"ip": "220.181.38.148", "lat": 39.9042, "lng": 116.4074, "country": "China", "country_code": "CN", "city": "Beijing", "region": "Beijing", "isp": "CHINANET", "flag": "🇨🇳"},
-        {"ip": "46.165.2.14", "lat": 52.5200, "lng": 13.4050, "country": "Germany", "country_code": "DE", "city": "Berlin", "region": "Berlin", "isp": "Leaseweb", "flag": "🇩🇪"},
-        {"ip": "200.221.2.45", "lat": -23.5505, "lng": -46.6333, "country": "Brazil", "country_code": "BR", "city": "Sao Paulo", "region": "Sao Paulo", "isp": "UOL", "flag": "🇧🇷"},
-        {"ip": "82.197.200.4", "lat": 52.3676, "lng": 4.9041, "country": "Netherlands", "country_code": "NL", "city": "Amsterdam", "region": "North Holland", "isp": "Hostnet", "flag": "🇳🇱"},
-        {"ip": "101.100.180.2", "lat": 1.3521, "lng": 103.8198, "country": "Singapore", "country_code": "SG", "city": "Singapore", "region": "Singapore", "isp": "SingTel", "flag": "🇸🇬"},
-        {"ip": "103.241.136.1", "lat": 28.6139, "lng": 77.2090, "country": "India", "country_code": "IN", "city": "New Delhi", "region": "Delhi", "isp": "Airtel", "flag": "🇮🇳"},
-        {"ip": "43.242.144.1", "lat": 19.0760, "lng": 72.8777, "country": "India", "country_code": "IN", "city": "Mumbai", "region": "Maharashtra", "isp": "Reliance Jio", "flag": "🇮🇳"},
-        {"ip": "210.140.10.10", "lat": 35.6762, "lng": 139.6503, "country": "Japan", "country_code": "JP", "city": "Tokyo", "region": "Tokyo", "isp": "NTT Communications", "flag": "🇯🇵"},
-        {"ip": "109.228.0.1", "lat": 51.5074, "lng": -0.1278, "country": "United Kingdom", "country_code": "GB", "city": "London", "region": "England", "isp": "British Telecom", "flag": "🇬🇧"},
-        {"ip": "198.41.0.4", "lat": 43.6532, "lng": -79.3832, "country": "Canada", "country_code": "CA", "city": "Toronto", "region": "Ontario", "isp": "Rogers", "flag": "🇨🇦"},
+        {"ip": "198.51.100.42", "lat": 37.0902, "lng": -95.7129, "country": "United States", "country_code": "US", "city": "Coffeyville", "region": "Kansas", "isp": "Google LLC", "flag": ""},
+        {"ip": "95.163.220.12", "lat": 55.7558, "lng": 37.6173, "country": "Russia", "country_code": "RU", "city": "Moscow", "region": "Moscow", "isp": "Digital Ocean", "flag": ""},
+        {"ip": "220.181.38.148", "lat": 39.9042, "lng": 116.4074, "country": "China", "country_code": "CN", "city": "Beijing", "region": "Beijing", "isp": "CHINANET", "flag": ""},
+        {"ip": "46.165.2.14", "lat": 52.5200, "lng": 13.4050, "country": "Germany", "country_code": "DE", "city": "Berlin", "region": "Berlin", "isp": "Leaseweb", "flag": ""},
+        {"ip": "200.221.2.45", "lat": -23.5505, "lng": -46.6333, "country": "Brazil", "country_code": "BR", "city": "Sao Paulo", "region": "Sao Paulo", "isp": "UOL", "flag": ""},
+        {"ip": "82.197.200.4", "lat": 52.3676, "lng": 4.9041, "country": "Netherlands", "country_code": "NL", "city": "Amsterdam", "region": "North Holland", "isp": "Hostnet", "flag": ""},
+        {"ip": "101.100.180.2", "lat": 1.3521, "lng": 103.8198, "country": "Singapore", "country_code": "SG", "city": "Singapore", "region": "Singapore", "isp": "SingTel", "flag": ""},
+        {"ip": "103.241.136.1", "lat": 28.6139, "lng": 77.2090, "country": "India", "country_code": "IN", "city": "New Delhi", "region": "Delhi", "isp": "Airtel", "flag": ""},
+        {"ip": "43.242.144.1", "lat": 19.0760, "lng": 72.8777, "country": "India", "country_code": "IN", "city": "Mumbai", "region": "Maharashtra", "isp": "Reliance Jio", "flag": ""},
+        {"ip": "210.140.10.10", "lat": 35.6762, "lng": 139.6503, "country": "Japan", "country_code": "JP", "city": "Tokyo", "region": "Tokyo", "isp": "NTT Communications", "flag": ""},
+        {"ip": "109.228.0.1", "lat": 51.5074, "lng": -0.1278, "country": "United Kingdom", "country_code": "GB", "city": "London", "region": "England", "isp": "British Telecom", "flag": ""},
+        {"ip": "198.41.0.4", "lat": 43.6532, "lng": -79.3832, "country": "Canada", "country_code": "CA", "city": "Toronto", "region": "Ontario", "isp": "Rogers", "flag": ""},
     ]
 
     new_attacks = []

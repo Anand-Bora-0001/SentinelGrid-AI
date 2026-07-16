@@ -33,9 +33,9 @@ try:
         # Test connection
         _redis_client.ping()
         _using_redis = True
-        logger.info(f"🔴 Redis cache connected: {REDIS_URL[:30]}...")
+        logger.info(f" Redis cache connected: {REDIS_URL[:30]}...")
 except Exception as e:
-    logger.warning(f"⚠️ Redis not available ({e}), using in-memory cache")
+    logger.warning(f"️ Redis not available ({e}), using in-memory cache")
     _redis_client = None
     _using_redis = False
 
@@ -139,7 +139,7 @@ def cache_flush():
             _redis_client.flushall()
         else:
             _fallback_cache.flushall()
-        logger.info("🧹 Cache flushed")
+        logger.info(" Cache flushed")
     except Exception as e:
         logger.warning(f"Cache FLUSH error: {e}")
         _fallback_cache.flushall()

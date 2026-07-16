@@ -23,7 +23,7 @@ def generate_report_async(self, report_format: str, events: list, stats: dict, s
     Supports: pdf, csv, xlsx
     """
     try:
-        logger.info(f"📝 Generating {report_format.upper()} report ({len(events)} events)...")
+        logger.info(f" Generating {report_format.upper()} report ({len(events)} events)...")
 
         from ..report_generator import generate_csv_report, generate_pdf_report
         from ..excel_export import generate_excel_report
@@ -53,11 +53,11 @@ def generate_report_async(self, report_format: str, events: list, stats: dict, s
             except Exception as e:
                 logger.warning(f"Telegram send failed in background: {e}")
 
-        logger.info(f"✅ Report generated: {filepath}")
+        logger.info(f" Report generated: {filepath}")
         return {"status": "success", "filepath": filepath, "format": report_format}
 
     except Exception as e:
-        logger.error(f"❌ Report generation failed: {e}")
+        logger.error(f" Report generation failed: {e}")
         if hasattr(self, 'retry'):
             raise self.retry(exc=e, countdown=10)
         return {"status": "error", "error": str(e)}

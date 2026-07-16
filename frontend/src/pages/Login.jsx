@@ -44,7 +44,7 @@ export default function Login() {
       <div className="w-full max-w-md p-8 rounded-2xl glass-panel border border-slate-800 shadow-2xl relative z-10 mx-4">
         {/* Platform Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex p-3.5 rounded-xl bg-slate-900 border border-slate-800/80 text-cyber-cyan mb-4 shadow-cyber-neon">
+          <div className="inline-flex p-3.5 rounded-xl bg-slate-900 border border-slate-800/80 text-cyber-cyan mb-4 shadow-md">
             <Shield className="h-7 w-7" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white m-0 uppercase">
@@ -108,7 +108,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 rounded-lg bg-cyber-cyan text-cyber-bg font-semibold text-sm hover:bg-cyber-cyan/95 focus:outline-none transition-all flex items-center justify-center gap-2 shadow-cyber-neon active:scale-98 font-mono disabled:opacity-50"
+            className="w-full py-3.5 px-4 rounded-lg bg-cyber-cyan text-cyber-bg font-semibold text-sm hover:bg-cyber-cyan/95 focus:outline-none transition-all flex items-center justify-center gap-2 shadow-md active:scale-98 font-mono disabled:opacity-50"
           >
             {loading ? (
               <RefreshCw className="h-4 w-4 animate-spin" />

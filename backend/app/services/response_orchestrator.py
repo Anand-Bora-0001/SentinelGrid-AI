@@ -326,7 +326,7 @@ class ResponseOrchestrator:
             "rollback_procedure": template.get("rollback_procedure", "Manual rollback required"),
             "simulation_status": "SIMULATED",
             "execution_status": "NOT_EXECUTED",
-            "note": "⚠️ This is a SIMULATION. No real actions were taken.",
+            "note": "️ This is a SIMULATION. No real actions were taken.",
         }
 
         return simulation

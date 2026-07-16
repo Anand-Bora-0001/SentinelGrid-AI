@@ -68,7 +68,7 @@ export default function Sidebar() {
               to={item.path}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border group ${
                 isActive
-                  ? "bg-cyber-cyan/10 border-cyber-cyan text-cyber-cyan shadow-cyber-neon"
+                  ? "bg-cyber-cyan/10 border-cyber-cyan text-cyber-cyan shadow-md"
                   : "border-transparent text-slate-400 hover:text-white hover:bg-slate-800/40 hover:border-slate-800"
               }`}
             >

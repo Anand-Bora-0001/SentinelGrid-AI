@@ -27,15 +27,15 @@ def send_telegram_alert_async(self, message: str, organization_id: int = None):
         try:
             success = send_telegram_alert(message, db=db, organization_id=organization_id)
             if success:
-                logger.info(f"✅ Background Telegram alert sent (org: {organization_id})")
+                logger.info(f" Background Telegram alert sent (org: {organization_id})")
             else:
-                logger.warning(f"⚠️ Telegram alert failed (org: {organization_id})")
+                logger.warning(f"️ Telegram alert failed (org: {organization_id})")
             return {"status": "sent" if success else "failed"}
         finally:
             db.close()
 
     except Exception as e:
-        logger.error(f"❌ Background Telegram alert error: {e}")
+        logger.error(f" Background Telegram alert error: {e}")
         if hasattr(self, 'retry'):
             raise self.retry(exc=e, countdown=30)
         return {"status": "error", "error": str(e)}
@@ -61,7 +61,7 @@ def send_email_alert_async(self, to_emails: list, alert_type: str, event_data: d
         return {"status": "sent" if success else "failed"}
 
     except Exception as e:
-        logger.error(f"❌ Background email alert error: {e}")
+        logger.error(f" Background email alert error: {e}")
         if hasattr(self, 'retry'):
             raise self.retry(exc=e, countdown=30)
         return {"status": "error", "error": str(e)}

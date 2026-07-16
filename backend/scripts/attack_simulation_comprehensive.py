@@ -21,7 +21,7 @@ ATTACK_DELAY = 0.3
 def print_banner():
     """Print comprehensive banner"""
     print("\n" + "="*70)
-    print("🎯 SentinelGrid COMPREHENSIVE Attack Monitoring Suite")
+    print(" SentinelGrid COMPREHENSIVE Attack Monitoring Suite")
     print("   Monitors ALL attack types: ThreatSensors + Web Apps + E-commerce")
     print("="*70)
     print(f"Target Demo App: {DEMO_ECOMMERCE_URL}")
@@ -32,7 +32,7 @@ def print_banner():
 
 def clear_database():
     """Clear the SentinelGrid database for fresh start"""
-    print("🗑️  Clearing SentinelGrid database...")
+    print("️  Clearing SentinelGrid database...")
     
     db_paths = [
         "backend/sentinelgrid.db",
@@ -47,15 +47,15 @@ def clear_database():
                 cursor.execute("DELETE FROM events")
                 conn.commit()
                 conn.close()
-                print(f"   ✅ Cleared {db_path}")
+                print(f"    Cleared {db_path}")
             except Exception as e:
-                print(f"   ⚠️ Could not clear {db_path}: {e}")
+                print(f"   ️ Could not clear {db_path}: {e}")
     
-    print("   🔄 Database reset complete\n")
+    print("    Database reset complete\n")
 
 def login_to_sentinelgrid():
     """Login to SentinelGrid and get token"""
-    print("🔐 Authenticating with SentinelGrid...")
+    print(" Authenticating with SentinelGrid...")
     
     try:
         response = requests.post(
@@ -67,19 +67,19 @@ def login_to_sentinelgrid():
         
         if response.status_code == 200:
             token = response.json()["access_token"]
-            print("   ✅ Authentication successful")
+            print("    Authentication successful")
             return token
         else:
-            print(f"   ❌ Authentication failed: {response.status_code}")
+            print(f"    Authentication failed: {response.status_code}")
             return None
             
     except Exception as e:
-        print(f"   ❌ Authentication error: {e}")
+        print(f"    Authentication error: {e}")
         return None
 
 def simulate_ssh_threat_sensor_attacks():
     """Simulate SSH threat_sensor attacks"""
-    print("🔐 Simulating SSH ThreatSensor Attacks...")
+    print(" Simulating SSH ThreatSensor Attacks...")
     
     ssh_attacks = [
         {"username": "root", "password": "123456", "severity": "CRITICAL", "command": "rm -rf /"},
@@ -114,7 +114,7 @@ def simulate_ssh_threat_sensor_attacks():
 
 def simulate_ftp_threat_sensor_attacks():
     """Simulate FTP threat_sensor attacks"""
-    print("\n📁 Simulating FTP ThreatSensor Attacks...")
+    print("\n Simulating FTP ThreatSensor Attacks...")
     
     ftp_attacks = [
         {"username": "anonymous", "password": "guest@example.com", "severity": "MEDIUM", "command": "LIST"},
@@ -148,7 +148,7 @@ def simulate_ftp_threat_sensor_attacks():
 
 def simulate_http_threat_sensor_attacks():
     """Simulate HTTP threat_sensor attacks"""
-    print("\n🌐 Simulating HTTP ThreatSensor Attacks...")
+    print("\n Simulating HTTP ThreatSensor Attacks...")
     
     http_attacks = [
         {"endpoint": "/admin", "method": "GET", "severity": "HIGH"},
@@ -190,7 +190,7 @@ def simulate_http_threat_sensor_attacks():
 
 def simulate_telnet_threat_sensor_attacks():
     """Simulate TELNET threat_sensor attacks"""
-    print("\n📟 Simulating TELNET ThreatSensor Attacks...")
+    print("\n Simulating TELNET ThreatSensor Attacks...")
     
     telnet_attacks = [
         {"username": "admin", "password": "admin", "severity": "HIGH", "command": "enable"},
@@ -223,10 +223,10 @@ def simulate_telnet_threat_sensor_attacks():
 
 def simulate_demo_ecommerce_attacks():
     """Simulate attacks against demo e-commerce application"""
-    print("\n🛒 Simulating Demo E-commerce Attacks...")
+    print("\n Simulating Demo E-commerce Attacks...")
     
     # Brute force login attacks
-    print("   🔓 Brute force login attempts...")
+    print("    Brute force login attempts...")
     common_passwords = [
         "admin", "password", "123456", "admin123", "root",
         "password123", "qwerty", "letmein", "welcome", "monkey"
@@ -268,13 +268,13 @@ def simulate_demo_ecommerce_attacks():
             send_attack_to_sentinelgrid(attack_data, f"E-commerce Login Attack {i+1}")
             
         except Exception as e:
-            print(f"   ⚠️ E-commerce attack {i+1}: {e}")
+            print(f"   ️ E-commerce attack {i+1}: {e}")
         
         time.sleep(ATTACK_DELAY)
 
 def simulate_sql_injection_attacks():
     """Simulate SQL injection attempts"""
-    print("\n💉 Simulating SQL Injection Attacks...")
+    print("\n Simulating SQL Injection Attacks...")
     
     sql_payloads = [
         {"payload": "' OR '1'='1", "severity": "CRITICAL"},
@@ -319,7 +319,7 @@ def simulate_sql_injection_attacks():
 
 def simulate_directory_traversal_attacks():
     """Simulate directory traversal attacks"""
-    print("\n📁 Simulating Directory Traversal Attacks...")
+    print("\n Simulating Directory Traversal Attacks...")
     
     traversal_payloads = [
         {"payload": "../../../etc/passwd", "severity": "HIGH"},
@@ -367,19 +367,19 @@ def send_attack_to_sentinelgrid(attack_data, attack_name):
         )
         
         if response.status_code == 200:
-            print(f"   ✅ {attack_name}: {attack_data['service']} from {attack_data['source_ip']} -> {attack_data['severity']}")
+            print(f"    {attack_name}: {attack_data['service']} from {attack_data['source_ip']} -> {attack_data['severity']}")
         else:
-            print(f"   ❌ {attack_name}: Failed ({response.status_code})")
+            print(f"    {attack_name}: Failed ({response.status_code})")
             
     except Exception as e:
-        print(f"   ⚠️ {attack_name}: {str(e)[:50]}...")
+        print(f"   ️ {attack_name}: {str(e)[:50]}...")
 
 def check_comprehensive_results(token):
     """Check all attack results in SentinelGrid"""
-    print("\n📊 Checking Comprehensive Attack Results...")
+    print("\n Checking Comprehensive Attack Results...")
     
     if not token:
-        print("   ❌ No authentication token available")
+        print("    No authentication token available")
         return
     
     headers = {"Authorization": f"Bearer {token}"}
@@ -393,8 +393,8 @@ def check_comprehensive_results(token):
             stats = stats_response.json()
             events = events_response.json()
             
-            print(f"   ✅ Total Events: {stats.get('total_events', 0)}")
-            print(f"   ✅ Recent Events: {len(events)}")
+            print(f"    Total Events: {stats.get('total_events', 0)}")
+            print(f"    Recent Events: {len(events)}")
             
             # Count by service
             service_counts = {}
@@ -410,22 +410,22 @@ def check_comprehensive_results(token):
                 severity_counts[severity] = severity_counts.get(severity, 0) + 1
                 attack_type_counts[attack_type] = attack_type_counts.get(attack_type, 0) + 1
             
-            print(f"   📊 By Service: {dict(service_counts)}")
-            print(f"   📊 By Severity: {dict(severity_counts)}")
-            print(f"   📊 By Attack Type: {dict(attack_type_counts)}")
+            print(f"    By Service: {dict(service_counts)}")
+            print(f"    By Severity: {dict(severity_counts)}")
+            print(f"    By Attack Type: {dict(attack_type_counts)}")
             
         else:
-            print(f"   ❌ Failed to fetch results: Stats {stats_response.status_code}, Events {events_response.status_code}")
+            print(f"    Failed to fetch results: Stats {stats_response.status_code}, Events {events_response.status_code}")
             
     except Exception as e:
-        print(f"   ❌ Error checking results: {e}")
+        print(f"    Error checking results: {e}")
 
 def main():
     """Run comprehensive attack simulation"""
     print_banner()
     
     # Option to reset database
-    reset_choice = input("🔄 Reset database before starting? (y/N): ").lower().strip()
+    reset_choice = input(" Reset database before starting? (y/N): ").lower().strip()
     if reset_choice == 'y':
         clear_database()
     
@@ -446,13 +446,13 @@ def main():
     
     # Final instructions
     print("\n" + "="*70)
-    print("🎉 COMPREHENSIVE Attack Simulation Complete!")
+    print(" COMPREHENSIVE Attack Simulation Complete!")
     print("="*70)
-    print("📊 View ALL attack types at:")
+    print(" View ALL attack types at:")
     print(f"   → Dashboard: {DASHBOARD_URL}/dashboard.html")
     print("   → Login: admin / admin123")
     print()
-    print("🔄 You should now see attacks from:")
+    print(" You should now see attacks from:")
     print("   → SSH ThreatSensor (brute force, command injection)")
     print("   → FTP ThreatSensor (credential stuffing, file access)")
     print("   → HTTP ThreatSensor (web probes, admin access)")

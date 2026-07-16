@@ -89,16 +89,9 @@ export default function ThreatMap() {
       const data = await api.get("/api/telemetry", { limit: 100 });
       const items = data?.items || [];
       const geoItems = items.filter((e) => e.location?.lat && e.location?.lng);
-      setAllEvents(geoItems.length > 0 ? geoItems : DEMO_THREATS);
-    } catch {
-      try {
-        const data = await api.get("/api/events", { limit: 100 });
-        const items = Array.isArray(data) ? data : [];
-        const geoItems = items.filter((e) => e.location?.lat && e.location?.lng);
-        setAllEvents(geoItems.length > 0 ? geoItems : DEMO_THREATS);
-      } catch {
-        setAllEvents(DEMO_THREATS);
-      }
+      setAllEvents(geoItems);
+    } catch (err) {
+      setAllEvents([]);
     } finally {
       setLoading(false);
     }
@@ -166,7 +159,7 @@ export default function ThreatMap() {
             <Eye className="h-4 w-4 text-cyber-cyan shrink-0" />
             <div>
               <div className="text-lg font-bold font-mono text-cyber-cyan">{filteredEvents.length}</div>
-              <div className="text-[9px] text-slate-500 font-mono uppercase tracking-wider">Total Active</div>
+              <div className="text-[9px] text-slate-500 font-mono uppercase tracking-wider">External Threats</div>
             </div>
           </div>
         </div>
@@ -415,7 +408,7 @@ export default function ThreatMap() {
                     onClick={() => setSelectedEvent(null)}
                     className="text-[10px] text-slate-500 hover:text-white"
                   >
-                    ✕
+                    
                   </button>
                 </div>
                 <p className="text-xs font-bold text-white mb-2 leading-tight">
@@ -452,7 +445,7 @@ export default function ThreatMap() {
                   </div>
                   {selectedEvent.is_anomaly && (
                     <div className="mt-2 text-[10px] text-cyber-purple font-semibold">
-                      ⚠️ AI Anomaly — {Math.round(selectedEvent.risk_score || 85)}%
+                      ️ AI Anomaly — {Math.round(selectedEvent.risk_score || 85)}%
                       Risk
                     </div>
                   )}

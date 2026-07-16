@@ -136,7 +136,7 @@ class EmailService:
         Returns:
             bool: True if sent successfully
         """
-        subject = f"🚨 {alert_type} - SentinelGrid Security Alert"
+        subject = f" {alert_type} - SentinelGrid Security Alert"
         
         # Generate HTML email body
         html_body = self._generate_alert_html(alert_type, event_data)
@@ -179,13 +179,13 @@ class EmailService:
             
             <!-- Header -->
             <div style="background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-                <h1 style="margin: 0; font-size: 24px;">🍯 SentinelGrid Security</h1>
+                <h1 style="margin: 0; font-size: 24px;"> SentinelGrid Security</h1>
                 <p style="margin: 5px 0 0 0; opacity: 0.9;">Professional Threat Monitoring</p>
             </div>
             
             <!-- Alert Header -->
             <div style="background: {color}; color: white; padding: 15px; text-align: center;">
-                <h2 style="margin: 0; font-size: 20px;">🚨 {alert_type}</h2>
+                <h2 style="margin: 0; font-size: 20px;"> {alert_type}</h2>
                 <p style="margin: 5px 0 0 0; font-size: 14px;">Severity: {severity}</p>
             </div>
             
@@ -221,7 +221,7 @@ class EmailService:
             
             <!-- Recommendations -->
             <div style="background: white; padding: 20px; border: 1px solid #e5e7eb;">
-                <h3 style="color: #374151; margin-top: 0;">🛡️ Recommended Actions</h3>
+                <h3 style="color: #374151; margin-top: 0;">️ Recommended Actions</h3>
                 <ul style="color: #6b7280; padding-left: 20px;">
                     <li>Review the attached security report for detailed analysis</li>
                     <li>Monitor for additional attacks from this IP address</li>
@@ -249,7 +249,7 @@ class EmailService:
         
         return f"""
         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
-            <h4 style="color: #374151; margin: 0 0 10px 0;">🌍 Geographic Information</h4>
+            <h4 style="color: #374151; margin: 0 0 10px 0;"> Geographic Information</h4>
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                     <td style="padding: 4px 0; font-weight: bold; width: 30%;">Country:</td>

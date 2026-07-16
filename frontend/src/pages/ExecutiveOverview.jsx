@@ -49,26 +49,29 @@ export default function ExecutiveOverview() {
       
       const dbMetrics = healthData?.database?.metrics || {};
       const activeIncCount = dbMetrics.active_incidents || 0;
+      const telemetryCount = dbMetrics.telemetry_count || 0;
       
       // Calculate risk score based on active incidents and vulnerabilities
-      let riskScore = 15; // baseline
-      riskScore += activeIncCount * 25;
-      riskScore += (dbMetrics.vulnerability_count || 0) * 2;
-      riskScore = Math.min(riskScore, 98); // cap at 98 for demo
+      let riskScore = 0;
+      if (telemetryCount > 0) {
+        riskScore = 15; // baseline
+        riskScore += activeIncCount * 25;
+        riskScore += (dbMetrics.vulnerability_count || 0) * 2;
+        riskScore = Math.min(riskScore, 98); // cap at 98 for demo
+      }
 
       // Map origins
-      const topOrigins = [
+      const topOrigins = telemetryCount > 0 ? [
         { country: "Russia", count: 42, percentage: 45, code: "RU" },
         { country: "China", count: 28, percentage: 30, code: "CN" },
         { country: "North Korea", count: 15, percentage: 16, code: "KP" },
         { country: "Unknown / Tor", count: 8, percentage: 9, code: "Tor" }
-      ];
+      ] : [];
 
       const parsedTrend = (forecastData?.forecast && forecastData.forecast.length > 0)
         ? forecastData.forecast.map(f => {
             const dateObj = new Date(f.date);
             const dayLabel = dateObj.toLocaleDateString('en-US', { weekday: 'short' }) + " " + dateObj.getDate();
-            // Scale value to fit a nice 100-scale risk index and 500-scale event count visualizer
             const riskVal = Math.min(95, Math.max(10, Math.round(f.predicted_risk * 12)));
             const eventVal = Math.max(15, Math.round(f.predicted_risk * 8));
             return {
@@ -77,7 +80,7 @@ export default function ExecutiveOverview() {
               risk: riskVal
             };
           })
-        : [
+        : (telemetryCount > 0 ? [
             { day: "Mon", count: 120, risk: 25 },
             { day: "Tue", count: 180, risk: 30 },
             { day: "Wed", count: 320, risk: 45 },
@@ -85,7 +88,7 @@ export default function ExecutiveOverview() {
             { day: "Fri", count: 410, risk: 55 },
             { day: "Sat", count: 150, risk: 40 },
             { day: "Sun", count: 290, risk: 65 }
-          ];
+          ] : []);
 
       setData({
         riskScore: riskScore,

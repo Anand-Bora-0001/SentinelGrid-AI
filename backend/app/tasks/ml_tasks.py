@@ -27,7 +27,7 @@ def train_model_async(self, organization_id: int = None):
         metrics = loop.run_until_complete(ml_training_service.train_model_manual(organization_id))
         loop.close()
 
-        logger.info(f"✅ Background ML training complete (accuracy: {metrics.accuracy:.3f})")
+        logger.info(f" Background ML training complete (accuracy: {metrics.accuracy:.3f})")
         return {
             "status": "success",
             "accuracy": metrics.accuracy,
@@ -35,7 +35,7 @@ def train_model_async(self, organization_id: int = None):
         }
 
     except Exception as e:
-        logger.error(f"❌ Background ML training failed: {e}")
+        logger.error(f" Background ML training failed: {e}")
         if hasattr(self, 'retry'):
             raise self.retry(exc=e, countdown=60)
         return {"status": "error", "error": str(e)}
@@ -64,5 +64,5 @@ def batch_predict_async(events: list):
         return {"status": "success", "predictions": len(results), "results": results}
 
     except Exception as e:
-        logger.error(f"❌ Batch prediction failed: {e}")
+        logger.error(f" Batch prediction failed: {e}")
         return {"status": "error", "error": str(e)}

@@ -42,11 +42,11 @@ def generate_csv_report(events: List[dict], filename: str = None) -> str:
             for event in events:
                 writer.writerow({k: event.get(k, '') for k in fieldnames})
         
-        logger.info(f"✅ CSV report generated: {filename}")
+        logger.info(f" CSV report generated: {filename}")
         return filename
     
     except Exception as e:
-        logger.error(f"❌ Error generating CSV report: {e}")
+        logger.error(f" Error generating CSV report: {e}")
         raise
 
 
@@ -78,7 +78,7 @@ def generate_pdf_report(events: List[dict], stats: dict, filename: str = None) -
         text_filename = filename.replace('.pdf', '.txt')
         return _generate_text_report(events, stats, text_filename)
     except Exception as e:
-        logger.error(f"❌ Error generating PDF report: {e}")
+        logger.error(f" Error generating PDF report: {e}")
         # Fallback to text file
         text_filename = filename.replace('.pdf', '.txt')
         return _generate_text_report(events, stats, text_filename)
@@ -105,7 +105,7 @@ def _generate_actual_pdf(events: List[dict], stats: dict, filename: str) -> str:
             spaceAfter=30,
             textColor=colors.darkblue
         )
-        story.append(Paragraph("🍯 SentinelGrid Security Report", title_style))
+        story.append(Paragraph(" SentinelGrid Security Report", title_style))
         story.append(Spacer(1, 12))
         
         # Metadata
@@ -191,7 +191,7 @@ def _generate_actual_pdf(events: List[dict], stats: dict, filename: str) -> str:
         
         # Build PDF
         doc.build(story)
-        logger.info(f"✅ PDF report generated: {filename}")
+        logger.info(f" PDF report generated: {filename}")
         return filename
         
     except ImportError as e:
@@ -243,9 +243,9 @@ def _generate_text_report(events: List[dict], stats: dict, filename: str) -> str
                     f.write(f"  Command: {event.get('command')}\n")
                 f.write("\n")
         
-        logger.info(f"✅ Text report generated: {filename}")
+        logger.info(f" Text report generated: {filename}")
         return filename
     
     except Exception as e:
-        logger.error(f"❌ Error generating text report: {e}")
+        logger.error(f" Error generating text report: {e}")
         raise

@@ -151,9 +151,9 @@ class RateLimiter:
             )
             # Test connection
             self.redis_client.ping()
-            logger.info("✅ Redis connected for rate limiting")
+            logger.info(" Redis connected for rate limiting")
         except Exception as e:
-            logger.warning(f"⚠️ Redis not available, using in-memory rate limiting: {e}")
+            logger.warning(f"️ Redis not available, using in-memory rate limiting: {e}")
             self.redis_client = None
     
     def check_rate_limit(self, key: str, limit: int, window: int) -> RateLimitResult:

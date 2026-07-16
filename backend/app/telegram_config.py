@@ -51,7 +51,7 @@ class TelegramConfigManager:
             bot_username = bot_info.get("username", "Unknown")
             
             # Test sending a message to the chat
-            test_message = f"🧪 SentinelGrid Configuration Test\n\n✅ Bot connected successfully!\n🤖 Bot: @{bot_username}\n📱 Chat ID: {chat_id}\n\nYour Telegram alerts are now configured."
+            test_message = f" SentinelGrid Configuration Test\n\n Bot connected successfully!\n Bot: @{bot_username}\n Chat ID: {chat_id}\n\nYour Telegram alerts are now configured."
             
             send_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
             send_payload = {
@@ -174,7 +174,7 @@ class TelegramConfigManager:
             
             db.commit()
             
-            logger.info(f"✅ Telegram configured for user {username} and organization {user.organization.name}")
+            logger.info(f" Telegram configured for user {username} and organization {user.organization.name}")
             
             return {
                 "success": True,
@@ -271,12 +271,12 @@ class TelegramConfigManager:
                 }
             
             test_message = f"""
-🧪 <b>SentinelGrid Test Message</b>
+ <b>SentinelGrid Test Message</b>
 
-✅ <b>Status:</b> Configuration working perfectly!
-👤 <b>User:</b> {username}
-📊 <b>System:</b> All monitoring systems operational
-🔔 <b>Alerts:</b> Ready to send notifications
+ <b>Status:</b> Configuration working perfectly!
+ <b>User:</b> {username}
+ <b>System:</b> All monitoring systems operational
+ <b>Alerts:</b> Ready to send notifications
 ⏰ <b>Time:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 Your Telegram integration is working correctly.

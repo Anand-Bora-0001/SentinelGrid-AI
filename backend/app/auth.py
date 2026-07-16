@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 from .config import JWT_SECRET_KEY as SECRET_KEY, JWT_ALGORITHM as ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")  # ✅ REMOVED leading slash
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")  #  REMOVED leading slash
 
 # Generate password hashes
 def get_password_hash(password: str) -> str:
@@ -40,7 +40,7 @@ for username, user_info in DEMO_USERS.items():
         "email": user_info["email"]
     }
 
-logger.info("✅ Users database initialized with hashed passwords")
+logger.info(" Users database initialized with hashed passwords")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password against hash"""
@@ -62,7 +62,7 @@ def ensure_demo_users_in_db(db: Session):
             db.add(demo_org)
             db.commit()
             db.refresh(demo_org)
-            logger.info("✅ Created demo organization")
+            logger.info(" Created demo organization")
         
         # Ensure demo users exist
         for username, user_data in DEMO_USERS.items():
@@ -80,7 +80,7 @@ def ensure_demo_users_in_db(db: Session):
                     telegram_configured=False
                 )
                 db.add(new_user)
-                logger.info(f"✅ Created demo user: {username}")
+                logger.info(f" Created demo user: {username}")
         
         db.commit()
         
@@ -102,7 +102,7 @@ def authenticate_user(username: str, password: str, db: Session = None):
                 user.last_login = datetime.now()
                 db.commit()
                 
-                logger.info(f"✅ Database authentication successful: {username}")
+                logger.info(f" Database authentication successful: {username}")
                 return {
                     "username": user.username,
                     "role": user.role,
@@ -117,10 +117,10 @@ def authenticate_user(username: str, password: str, db: Session = None):
     # Fallback to in-memory authentication
     user = fake_users_db.get(username)
     if not user or not verify_password(password, user["password"]):
-        logger.warning(f"❌ Failed login attempt: {username}")
+        logger.warning(f" Failed login attempt: {username}")
         return False
     
-    logger.info(f"✅ In-memory authentication successful: {username}")
+    logger.info(f" In-memory authentication successful: {username}")
     return user
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

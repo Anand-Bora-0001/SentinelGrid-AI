@@ -7,7 +7,6 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](#)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](#)
-[![ChromaDB](https://img.shields.io/badge/ChromaDB-FFA000?style=for-the-badge&logo=google-cloud&logoColor=white)](#)
 
 ---
 
@@ -19,32 +18,50 @@ India's critical national infrastructure is under sustained attack — and the d
 
 ---
 
-## 💡 Innovation Highlights
+## 💡 Innovation Highlights & Key Features
 
-SentinelGrid AI goes beyond traditional SIEM and SOC platforms by combining capabilities that are typically siloed across multiple enterprise products:
+SentinelGrid AI goes beyond traditional SIEM and SOC platforms by combining capabilities that are typically siloed across multiple enterprise products.
 
-| Capability | What Makes It Different |
-|---|---|
-| **Behavioural Anomaly Detection** | Per-entity baselines for users, devices, and network segments — no signatures required |
-| **APT Campaign Attribution** | MITRE ATT&CK TTP mapping with threat actor similarity scoring and next-stage prediction |
-| **Autonomous Response Orchestrator** | Executes pre-approved containment within seconds; human escalation gates for high blast-radius actions |
-| **Vulnerability Prioritisation** | Contextualises CVEs against your specific network topology and observed threat actor profiles |
-| **Cyber Resilience Digital Twin** | Attack path modelling and red team scenario testing without touching live systems |
-| **Threat Intelligence RAG** | Air-gapped semantic search over CVEs and OWASP — offline, no cloud dependency |
+### 1. 🌐 Geopolitical Threat Origin Map
+Visualize global APT campaigns and pinpoint where attacks are originating in real-time.
+![Threat Map](docs/threat-map.png)
+
+### 2. 🛡️ Active Security Incidents & Autonomous Response
+Manage all active incidents in a unified queue. The **Autonomous Response Orchestrator** executes pre-approved containment within seconds, while requiring human escalation for high blast-radius actions.
+![Active Incidents](docs/active-incidents.png)
+
+### 3. 🧩 MITRE ATT&CK Matrix Mapping
+Automatically maps observed behaviors to the MITRE ATT&CK framework, predicting the next stage of an APT campaign.
+![MITRE Matrix](docs/mitre-matrix.png)
+
+### 4. 🔮 Cyber Digital Twin & Blast Radius Simulation
+Test attack path modeling and red team scenarios without touching live systems. Simulate the blast radius of containment actions before executing them.
+![Digital Twin](docs/cyber-digital-twin.png)
+
+### 5. ⚠️ CNI Patch Prioritization
+Contextualizes CVEs against your specific network topology and observed threat actor profiles, highlighting the most critical vulnerabilities.
+![CNI Patch Prioritization](docs/cni-patch-prioritization.png)
+
+### 6. 🧠 Attack Predictions & UEBA Analytics
+Utilizes User and Entity Behavior Analytics (UEBA) to detect anomalies. Machine learning models predict future attack vectors based on historical telemetry.
+![Attack Predictions](docs/attack-predictions.png)
+
+### 7. 🕵️ Threat Intelligence RAG
+An integrated semantic search engine for threat intelligence. Ask questions about CVEs, APTs, and get actionable insights.
+![Threat Intelligence](docs/threat-intelligence.png)
 
 ---
 
-## 🚀 How to Run the Project (Local Development)
+## 🚀 How to Start the Project (Local Development)
 
 The project consists of a FastAPI Python backend and a React/Vite frontend. It uses SQLite for local development out of the box.
 
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+ & npm
-- (Optional) Docker for containerized deployment
 
 ### 1. Backend Setup (FastAPI)
-1. Navigate to the `backend` directory:
+1. Open a terminal and navigate to the `backend` directory:
    ```bash
    cd backend
    ```
@@ -62,12 +79,11 @@ The project consists of a FastAPI Python backend and a React/Vite frontend. It u
    ```
 4. Start the backend server:
    ```bash
-   python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+   python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
    ```
-   *The backend will automatically initialize the `sentinelgrid.db` SQLite database if it doesn't exist.*
 
 ### 2. Frontend Setup (React/Vite)
-1. Open a new terminal and navigate to the `frontend` directory:
+1. Open a **new terminal** and navigate to the `frontend` directory:
    ```bash
    cd frontend
    ```
@@ -79,54 +95,31 @@ The project consists of a FastAPI Python backend and a React/Vite frontend. It u
    ```bash
    npm run dev
    ```
-4. Open your browser and navigate to `http://localhost:5173`.
-5. Login with default credentials (if prompted):
+4. Open your browser and navigate to `http://localhost:5174`.
+
+### 3. Log In & Seed Data
+![Login Screen](docs/login.png)
+1. Login with default credentials:
    - **Username:** `admin`
    - **Password:** `admin123`
-
----
-
-## 🛠️ Implementation Details & Advanced Usage
-
-### Populating the Dashboard (Simulation)
-When you first start the application, the database is empty. To populate it with data:
-1. Open the **SentinelGrid AI Dashboard** in your browser.
-2. Click the **"Seed Threat Feed"** button (cyan button in the top right corner).
-3. The system will automatically inject 50 simulated telemetry events and multi-stage CNI campaigns.
-4. The backend uses the `app.ai.threat_rag.embedding_engine` to correlate the data.
-5. You can click this button multiple times to generate more data.
-
-### Managing Data & Clearing Logs
-The platform accumulates events and logs rapidly. You have two ways to clear data:
-- **Soft Deletion (Recycle Bin)**:
-  - From the UI, navigate to the **Active Incidents** page and click the red Trash icon to soft-delete all incidents.
-  - From the **Audit Trail** page, click **CLEAR ALL LOGS** to soft-delete all telemetry.
-- **Hard Deletion (Database Reset)**:
-  - To permanently wipe all generated data (logs, incidents, audit trail, telemetry), run the cleanup script from the `backend` folder:
-    ```bash
-    cd backend
-    python clear_all_logs.py
-    ```
-    *Note: This preserves your User and Organization records but wipes the simulation data.*
-
-### The Simulation Engine & Thresholds
-The `Seed Threat Feed` simulation actively adjusts your organization's anomaly threshold. 
-- In `models.py`, the `Organization` table has an `anomaly_threshold` column (default 0.70).
-- The `incidents.py` and `telemetry.py` routes actively read and adjust this threshold using Reinforcement Learning techniques. If a user flags an incident as a false positive, the threshold is raised to prevent similar alerts.
+2. Once on the dashboard, click the **"Seed Threat Feed"** button in the top right corner.
+3. This will instantly populate the platform with 50 simulated APT events so you can explore all features immediately!
 
 ---
 
 ## ⚙️ System Architecture
 
+![Executive Overview](docs/executive-overview.png)
+
 ```mermaid
 graph TD
     %% Telemetry Sources
-    A[IT & OT Sensors / Network Logs / Endpoint Telemetry] -->|Ingest REST API| B(FastAPI Ingestion Gateway)
+    A[IT & OT Sensors / Network Logs] -->|Ingest REST API| B(FastAPI Ingestion Gateway)
 
     %% AI Pipeline
     B --> C{Security Telemetry Router}
     C -->|Telemetry Events| D[UEBA Anomaly Detector\nIsolation Forest + OC-SVM]
-    C -->|Tactic Mapping| E[MITRE ATT&CK Engine\nTTP Mapping + Actor Similarity]
+    C -->|Tactic Mapping| E[MITRE ATT&CK Engine\nTTP Mapping]
     C -->|Asset Graph| F[Topology Attack Path Propagation\nDigital Twin Engine]
 
     %% Data / Knowledge Base
@@ -135,47 +128,18 @@ graph TD
     F -->|Movement Paths| G
 
     %% Vulnerability Prioritisation
-    G -->|Asset Inventory| V[Vulnerability Prioritisation Agent\nCVE Feed + Topology Context]
-
-    %% RAG & Threat Intel
-    H[SecOps Queries] -->|RAG Question| I[Threat Intel RAG Engine]
-    I -->|Vector Search| J[(ChromaDB\nCVEs + OWASP)]
-    J -->|Relevant Context| I
-    I -->|Answers & References| H
+    G -->|Asset Inventory| V[Vulnerability Prioritisation Agent]
 
     %% Response Orchestrator
     G -->|Critical Alerts| K[Response Playbook Orchestrator]
     K -->|Simulate Actions| L[Digital Twin Simulation Engine]
     L -->|Blast Radius Analysis| K
-    K -->|Low Blast Radius| M[Autonomous Execution\nIsolate · Block · Reset · Snapshot]
-    K -->|High Blast Radius| N[Human Escalation Gate\nSOC Analyst Approval]
+    K -->|Low Blast Radius| M[Autonomous Execution]
+    K -->|High Blast Radius| N[Human Escalation Gate]
     N -->|Approved| M
 ```
 
 ---
 
-## ⚡ Docker Deployment (Production)
-
-To run the application in a containerized environment (which spins up Postgres, Redis, and ChromaDB):
-
-1. Copy `.env.example` to `.env` and configure your credentials.
-2. Build and start all services:
-   ```bash
-   docker compose up --build -d
-   ```
-3. Verify all services are healthy:
-   ```bash
-   docker compose ps
-   ```
-
-| Service | URL |
-|---|---|
-| SOC Frontend | http://localhost:5173 |
-| Backend API Docs | http://localhost:8000/docs |
-| ChromaDB | http://localhost:8002/api/v1/heartbeat |
-
----
-
 ## 📄 License
-
-This project is licensed under the MIT License — see the `LICENSE` file for details.
+This project is licensed under the MIT License.

@@ -87,10 +87,10 @@ export default function AuditTrailView() {
   };
 
   const handleClearAllTelemetry = async () => {
-    if (!window.confirm("Are you sure you want to move ALL telemetry logs to the Recycle Bin?")) return;
+    if (!window.confirm("Are you sure you want to clear ALL logs, incidents, and dashboard data? This will reset the demo data.")) return;
     try {
       await api.delete("/api/telemetry/clear");
-      alert("All telemetry logs moved to Recycle Bin.");
+      alert("All dashboard data and logs have been cleared.");
       fetchTelemetry();
     } catch (err) {
       alert(`Failed to clear logs: ${err.message}`);
@@ -335,7 +335,7 @@ export default function AuditTrailView() {
                         {log.action}
                       </td>
                       <td className={`py-3 px-2 font-bold ${
-                        log.risk_score > 70 ? "text-rose-400 shadow-cyber-neon" : "text-emerald-400"
+                        log.risk_score > 70 ? "text-rose-400 shadow-md" : "text-emerald-400"
                       }`}>
                         {log.risk_score}%
                       </td>

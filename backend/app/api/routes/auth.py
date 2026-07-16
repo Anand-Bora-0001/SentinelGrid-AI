@@ -22,7 +22,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
     """Login endpoint - Returns JWT token"""
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
-        logger.warning(f"❌ Failed login attempt: {form_data.username}")
+        logger.warning(f" Failed login attempt: {form_data.username}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     access_token_expires = timedelta(minutes=settings.jwt_expire_minutes)
@@ -31,7 +31,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         expires_delta=access_token_expires
     )
 
-    logger.info(f"✅ User logged in: {user['username']}")
+    logger.info(f" User logged in: {user['username']}")
 
     return {
         "access_token": token,

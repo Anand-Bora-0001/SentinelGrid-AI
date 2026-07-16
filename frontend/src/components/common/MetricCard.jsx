@@ -11,10 +11,10 @@ export default function MetricCard({
   glowColor = "cyan" 
 }) {
   const shadowClasses = {
-    cyan: "hover:shadow-cyber-neon hover:border-cyber-cyan/30",
-    purple: "hover:shadow-cyber-neon-purple hover:border-cyber-purple/30",
-    danger: "hover:shadow-cyber-neon-danger hover:border-cyber-danger/30"
-  }[glowColor] || "hover:shadow-cyber-neon hover:border-cyber-cyan/30";
+    cyan: "hover:shadow-md hover:border-cyber-cyan/30",
+    purple: "hover:shadow-md-purple hover:border-cyber-purple/30",
+    danger: "hover:shadow-md-danger hover:border-cyber-danger/30"
+  }[glowColor] || "hover:shadow-md hover:border-cyber-cyan/30";
 
   return (
     <div className={`p-6 rounded-xl bg-cyber-card/65 border border-slate-800/80 backdrop-blur-md transition-all duration-300 ${shadowClasses}`}>
