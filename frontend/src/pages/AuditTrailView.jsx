@@ -90,8 +90,13 @@ export default function AuditTrailView() {
     if (!window.confirm("Are you sure you want to clear ALL logs, incidents, and dashboard data? This will reset the demo data.")) return;
     try {
       await api.delete("/api/telemetry/clear");
+      await api.delete("/api/incidents/clear");
+      await api.delete("/api/audit/clear");
       alert("All dashboard data and logs have been cleared.");
       fetchTelemetry();
+      if (activeTab === "audit") {
+        fetchLogs();
+      }
     } catch (err) {
       alert(`Failed to clear logs: ${err.message}`);
     }

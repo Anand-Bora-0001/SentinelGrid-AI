@@ -13,6 +13,36 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/audit", tags=["Audit Trail"])
 
 
+@router.delete("/clear")
+def clear_audit_logs(
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Clear all audit logs for the organization"""
+    from ...models import AuditLog, User
+    user = db.query(User).filter(User.username == current_user["username"]).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    deleted = db.query(AuditLog).filter(AuditLog.organization_id == user.organization_id).delete()
+    db.commit()
+    
+    # Log this action in the audit trail itself
+    new_log = AuditLog(
+        timestamp=datetime.now(timezone.utc),
+        actor=user.username,
+        actor_user_id=user.id,
+        action="clear_audit_logs",
+        resource_type="audit",
+        details={"message": f"Cleared {deleted} audit logs"},
+        organization_id=user.organization_id
+    )
+    db.add(new_log)
+    db.commit()
+    
+    return {"message": f"Successfully deleted {deleted} audit logs."}
+
+
 @router.get("")
 def list_audit_logs(
     actor: Optional[str] = None,

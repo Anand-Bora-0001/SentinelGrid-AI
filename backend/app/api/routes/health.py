@@ -23,11 +23,14 @@ def health_check(db: Session = Depends(get_db)):
         from ...models import SecurityTelemetry, Incident, Asset, Vulnerability
         db_status = "healthy"
         db_metrics = {
-            "telemetry_count": db.query(SecurityTelemetry).count(),
-            "incident_count": db.query(Incident).count(),
+            "telemetry_count": db.query(SecurityTelemetry).filter(SecurityTelemetry.is_deleted == False).count(),
+            "incident_count": db.query(Incident).filter(Incident.is_deleted == False).count(),
             "asset_count": db.query(Asset).count(),
             "vulnerability_count": db.query(Vulnerability).count(),
-            "active_incidents": db.query(Incident).filter(Incident.status.in_(["new", "investigating"])).count(),
+            "active_incidents": db.query(Incident).filter(
+                Incident.is_deleted == False,
+                Incident.status.in_(["new", "investigating"])
+            ).count(),
         }
     except Exception as e:
         logger.error(f"Health DB query failed: {e}")

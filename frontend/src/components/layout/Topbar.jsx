@@ -47,7 +47,8 @@ export default function Topbar({ title }) {
     try {
       await api.delete("/api/telemetry/clear");
       await api.delete("/api/incidents/clear");
-      alert("All logs and incidents have been cleared and moved to the Recycle Bin.");
+      await api.delete("/api/audit/clear");
+      alert("All logs, incidents, and audit trails have been cleared and moved to the Recycle Bin.");
       window.location.reload();
     } catch (err) {
       alert(`Clear failed: ${err.message}`);
